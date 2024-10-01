@@ -6,6 +6,6 @@ import retrofit2.http.GET
 
 interface SimpleApi {
 
-    @GET("d4e2bt6jba6cmiekqms")
+    @GET("d4e2bt6jba6cmiekqmsv")
     suspend fun getIP(): Response<MyIP>
 }
