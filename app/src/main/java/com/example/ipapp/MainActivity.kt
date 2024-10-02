@@ -1,11 +1,14 @@
 package com.example.ipapp
 
+import android.icu.util.TimeUnit
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import android.widget.TextView
 import okhttp3.*
 import androidx.lifecycle.ViewModelProvider
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.example.ipapp.R.layout.activity_main
 import com.example.ipapp.repository.Repository
 
@@ -21,7 +24,7 @@ class MainActivity : AppCompatActivity() {
         val repository = Repository()
         val viewModelFactory = MainViewModelFactory(repository)
         var textView: TextView = findViewById(R.id.textIp)
-
+        setupNetworkCheckWorker()
         viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
         viewModel.getIP()
         viewModel.myResponse.observe(this) { response ->
@@ -35,5 +38,18 @@ class MainActivity : AppCompatActivity() {
 
         }
     }
+
+    private fun setupNetworkCheckWorker() {
+        val networkCheckRequest = PeriodicWorkRequestBuilder<NetworkCheckWorker>(15, TimeUnit.MINUTE)
+            .build()
+
+        WorkManager.getInstance(this)
+            .enqueueUniquePeriodicWork(
+                "NetworkCheck",
+                ExistingPeriodicWorkPolicy.KEEP,
+                networkCheckRequest
+            )
+    }
+
 }
 
